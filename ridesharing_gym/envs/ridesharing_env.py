@@ -5,19 +5,27 @@ import numpy.random as npr
 
 class RidesharingEnv(gym.Env):
 
-    def __init__(self, grid_size, capacity, init_state):
+    grid_size = 25
+    capacity = 20
+
+    def __init__(self):
 
         self.action_space = spaces.Discrete(6) # N,S,E,W, center, and reject
-        self.grid_size = grid_size
-        self.capacity = capacity
+        # due to gym limitations must hardcode these parameters
+        self.grid_size = 25
+        self.capacity = 20
+
+        init_state = np.zeros(25)
+        init_state[0] = 10
 
         # save the initial state for calls to self.reset()
         self.init_state = init_state.astype('int8')
 
         self.grid_state = init_state.astype('int8')
+
         self.request_state = self._draw_request()
 
-        self.observation_space = spaces.Tuple((spaces.MultiDiscrete(np.tile(capacity, grid_size)), spaces.MultiDiscrete(np.array([grid_size, grid_size]))))
+        self.observation_space = spaces.Tuple((spaces.MultiDiscrete(np.tile(self.capacity, self.grid_size)), spaces.MultiDiscrete(np.array([self.grid_size, self.grid_size]))))
         # not done
 
     def _draw_request(self):
@@ -73,6 +81,7 @@ class RidesharingEnv(gym.Env):
     def reset(self):
         self.grid_state = self.init_state
         self.request_state = self._draw_request()
+        return (self.grid_state, self.request_state)
 
     def render(self, mode='human'):
         raise NotImplementedError
