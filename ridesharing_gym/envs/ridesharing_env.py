@@ -11,8 +11,7 @@ class RidesharingEnv(gym.Env):
         self.grid_size = grid_size
         self.capacity = capacity
 
-
-        # save the initial state for resetting
+        # save the initial state for calls to self.reset()
         self.init_state = init_state.astype('int8')
 
         self.grid_state = init_state.astype('int8')
@@ -32,21 +31,36 @@ class RidesharingEnv(gym.Env):
     def step(self, action):
         assert self.action_space.contains(action)
         reward = 0.0
-        raise NotImplementedError
+
+        request_start = self.request_state[0]
+        request_end = self.request_state[1]
 
         # move cars around if needed
         if action == 0: # reject
             pass
         if action == 1: # center
-            pass
+            self.grid_state[request_start] -= 1
+            self.grid_state[request_end] += 1
+            reward = 1.0
         if action == 2: # N
-            pass
+            # note: this is wrong. we aren't dispatching from
+            # the center. this should be somewhere other than
+            # request_start
+            self.grid_state[request_start] -= 1
+            self.grid_state[request_end] += 1
+            reward = 1.0
         if action == 3: # S
-            pass
+            self.grid_state[request_start] -= 1
+            self.grid_state[request_end] += 1
+            reward = 1.0
         if action == 4: # E
-            pass
+            self.grid_state[request_start] -= 1
+            self.grid_state[request_end] += 1
+            reward = 1.0
         if action == 5: # W
-            pass
+            self.grid_state[request_start] -= 1
+            self.grid_state[request_end] += 1
+            reward = 1.0
 
         # draw new request
         self.request_state = self._draw_request()
