@@ -12,11 +12,13 @@ class RidesharingEnv(gym.Env):
 
         self.action_space = spaces.Discrete(6) # N,S,E,W, center, and reject
         # due to gym limitations must hardcode these parameters
-        self.grid_size = 25
+        self.width = 5
+        self.length = 5
+        self.grid_size = self.width * self.length
         self.capacity = 20
 
         init_state = np.zeros(25)
-        init_state[0] = 10
+        init_state[12] = 10
 
         # save the initial state for calls to self.reset()
         self.init_state = init_state.astype('int8')
@@ -25,7 +27,8 @@ class RidesharingEnv(gym.Env):
 
         self.request_state = self._draw_request()
 
-        self.observation_space = spaces.Tuple((spaces.MultiDiscrete(np.tile(self.capacity, self.grid_size)), spaces.MultiDiscrete(np.array([self.grid_size, self.grid_size]))))
+        self.observation_space = spaces.Tuple((spaces.MultiDiscrete(np.tile(self.capacity, self.grid_size)), 
+                                               spaces.MultiDiscrete(np.array([self.grid_size, self.grid_size]))))
         # not done
 
     def _draw_request(self):
@@ -43,31 +46,14 @@ class RidesharingEnv(gym.Env):
         request_start = self.request_state[0]
         request_end = self.request_state[1]
 
+        loc = self.getLoc(request_start, action)
+
         # move cars around if needed
         if action == 0: # reject
             pass
-        if action == 1: # center
-            self.grid_state[request_start] -= 1
-            self.grid_state[request_end] += 1
-            reward = 1.0
-        if action == 2: # N
-            # note: this is wrong. we aren't dispatching from
-            # the center. this should be somewhere other than
-            # request_start
-            self.grid_state[request_start] -= 1
-            self.grid_state[request_end] += 1
-            reward = 1.0
-        if action == 3: # S
-            self.grid_state[request_start] -= 1
-            self.grid_state[request_end] += 1
-            reward = 1.0
-        if action == 4: # E
-            self.grid_state[request_start] -= 1
-            self.grid_state[request_end] += 1
-            reward = 1.0
-        if action == 5: # W
-            self.grid_state[request_start] -= 1
-            self.grid_state[request_end] += 1
+        else:
+            self.updateCar(loc, -1)
+            self.updateCar(request_end, 1)
             reward = 1.0
 
         # draw new request
@@ -77,6 +63,45 @@ class RidesharingEnv(gym.Env):
                 reward,
                 False, # for now, don't worry about episodes
                 {})
+
+    def getLoc(self, origin, action):
+        """
+        Returna location index given a center and action.
+        If exceeds boundary of the grid, returns -1.
+        """
+        loc = origin
+
+        if action == 2: # N
+            loc = origin - self.width
+        if action == 3: # S
+            loc = origin + self.width
+        if action == 4: # E
+            loc = origin + 1
+        if action == 5: # W
+            loc = origin - 1        
+        if loc < 0 or loc > self.grid_size:
+            loc = -1
+
+        return loc
+
+    def updateCar(self, location, change):
+        """
+        Checks capacity and updates location.
+        """
+        if location == -1:
+            raise Exception('Illegal movement. Location out of bound!')
+
+        update = self.grid_state[location] + change
+
+        if update < 0:
+            raise Exception('Illegal movement. Number of cars below zero from location ', location)
+        elif update > self.capacity:
+            raise Exception('Illegal movement. Number of cars beyond capacity from location ', location)
+        else: 
+            self.grid_state = update
+
+        return
+
 
     def reset(self):
         self.grid_state = self.init_state
