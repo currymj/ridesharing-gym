@@ -77,7 +77,7 @@ class RidesharingEnv(gym.Env):
         elif update > self.capacity:
             raise Exception('Illegal movement. Number of cars beyond capacity from location ', location)
         else: 
-            self.grid_state[location] += update
+            self.grid_state[location] += change
 
         return
 
