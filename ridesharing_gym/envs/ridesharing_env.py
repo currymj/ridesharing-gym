@@ -1,6 +1,8 @@
 import gym
 import gym.spaces as spaces
 import numpy as np
+from ridesharing_gym.util import GridParameters
+
 
 class RidesharingEnv(gym.Env):
 
@@ -11,10 +13,7 @@ class RidesharingEnv(gym.Env):
 
         self.action_space = spaces.Discrete(6) # N,S,E,W, center, and reject
         # due to gym limitations must hardcode these parameters
-        self.width = 5
-        self.length = 5
-        self.grid_size = self.width * self.length
-        self.capacity = 20
+        self.grid = GridParameters(5, 5, 20)
 
         #init_state = np.zeros(25)
         #init_state[12] = 10
@@ -27,8 +26,8 @@ class RidesharingEnv(gym.Env):
 
         self.request_state = self._draw_request()
 
-        self.observation_space = spaces.Tuple((spaces.MultiDiscrete(np.tile(self.capacity, self.grid_size)), 
-                                               spaces.MultiDiscrete(np.array([self.grid_size, self.grid_size]))))
+        self.observation_space = spaces.Tuple((spaces.MultiDiscrete(np.tile(self.grid.capacity, self.grid.grid_size)), 
+                                               spaces.MultiDiscrete(np.array([self.grid.grid_size, self.grid.grid_size]))))
         # not done
 
     def _draw_request(self):
@@ -46,7 +45,7 @@ class RidesharingEnv(gym.Env):
         request_start = self.request_state[0]
         request_end = self.request_state[1]
 
-        loc = self._get_loc(request_start, action)
+        loc = self.grid.get_loc(request_start, action)
 
         # move cars around if needed
         if action == 0: # reject
@@ -63,26 +62,6 @@ class RidesharingEnv(gym.Env):
                 reward,
                 False, # for now, don't worry about episodes
                 {})
-
-    def _get_loc(self, origin, action):
-        """
-        Returna location index given a center and action.
-        If exceeds boundary of the grid, returns -1.
-        """
-        loc = origin
-
-        if action == 2: # N
-            loc = origin - self.width
-        if action == 3: # S
-            loc = origin + self.width
-        if action == 4: # E
-            loc = origin + 1
-        if action == 5: # W
-            loc = origin - 1
-        if loc < 0 or loc > self.grid_size:
-            loc = -1
-
-        return loc
 
     def _update_car(self, location, change):
         """
