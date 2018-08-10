@@ -1,4 +1,5 @@
 from gym.envs.registration import register
+import ridesharing_gym.policies
 
 register(
     id='ridesharing-v0',
