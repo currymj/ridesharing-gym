@@ -1,7 +1,6 @@
 import gym
 import gym.spaces as spaces
 import numpy as np
-import numpy.random as npr
 
 class RidesharingEnv(gym.Env):
 
@@ -17,8 +16,9 @@ class RidesharingEnv(gym.Env):
         self.grid_size = self.width * self.length
         self.capacity = 20
 
-        init_state = np.zeros(25)
-        init_state[12] = 10
+        #init_state = np.zeros(25)
+        #init_state[12] = 10
+        init_state = 4*np.ones(25)
 
         # save the initial state for calls to self.reset()
         self.init_state = init_state.astype('int8')
@@ -46,14 +46,14 @@ class RidesharingEnv(gym.Env):
         request_start = self.request_state[0]
         request_end = self.request_state[1]
 
-        loc = self.getLoc(request_start, action)
+        loc = self._get_loc(request_start, action)
 
         # move cars around if needed
         if action == 0: # reject
             pass
         else:
-            self.updateCar(loc, -1)
-            self.updateCar(request_end, 1)
+            self._update_car(loc, -1)
+            self._update_car(request_end, 1)
             reward = 1.0
 
         # draw new request
@@ -64,7 +64,7 @@ class RidesharingEnv(gym.Env):
                 False, # for now, don't worry about episodes
                 {})
 
-    def getLoc(self, origin, action):
+    def _get_loc(self, origin, action):
         """
         Returna location index given a center and action.
         If exceeds boundary of the grid, returns -1.
@@ -78,13 +78,13 @@ class RidesharingEnv(gym.Env):
         if action == 4: # E
             loc = origin + 1
         if action == 5: # W
-            loc = origin - 1        
+            loc = origin - 1
         if loc < 0 or loc > self.grid_size:
             loc = -1
 
         return loc
 
-    def updateCar(self, location, change):
+    def _update_car(self, location, change):
         """
         Checks capacity and updates location.
         """
@@ -98,7 +98,7 @@ class RidesharingEnv(gym.Env):
         elif update > self.capacity:
             raise Exception('Illegal movement. Number of cars beyond capacity from location ', location)
         else: 
-            self.grid_state = update
+            self.grid_state[location] += update
 
         return
 
