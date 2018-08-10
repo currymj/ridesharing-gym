@@ -15,9 +15,9 @@ class RidesharingEnv(gym.Env):
         # due to gym limitations must hardcode these parameters
         self.grid = GridParameters(5, 5, 20)
 
-        #init_state = np.zeros(25)
-        #init_state[12] = 10
-        init_state = 4*np.ones(25)
+        init_state = np.zeros(25)
+        init_state[12] = 10
+        #init_state = 4*np.ones(25)
 
         # save the initial state for calls to self.reset()
         self.init_state = init_state.astype('int8')
