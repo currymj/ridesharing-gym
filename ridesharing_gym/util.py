@@ -25,3 +25,22 @@ class GridParameters:
             loc = -1
 
         return loc
+
+    def get_coord(self, location):
+        """
+        Computes the longitudes and latitudes of the given location.
+        """
+        lat = location % self.width
+        long = location % self.length
+        
+        return np.array([lat, long])
+
+    def get_dist(self, origin, end):
+        """
+        Computes the distance between two points using Euclidean dist.
+        """
+        a = get_coord(origin)
+        b = get_coord(end)
+        dist = np.linalg.norm(a-b)
+
+        return dist
