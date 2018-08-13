@@ -1,3 +1,39 @@
+import numpy as np
+def undiscounted_episode_returns(rewards):
+    """
+    Given a sequence of rewards, returns the sequence
+    of the undiscounted returns (G_t) at each time step.
+    """
+    return np.cumsum(rewards[::-1])[::-1]
+
+# the following method could probably be made
+# much, much more efficient
+def discounted_episode_returns(rewards, gamma=0.999):
+    """
+    Given a sequence of rewards, returns the sequence
+    of the discounted returns (G_t) at each time step,
+    with discount rate gamma (default 0.999).
+    """
+
+    def cumulative_discounts(length):
+        res = np.zeros(length)
+        res[0] = 1.0
+        for i in range(1, length):
+            res[i] = gamma * res[i-1]
+        return res
+
+    result = np.zeros_like(rewards)
+    for i in range(len(rewards)):
+        discounts = cumulative_discounts(len(rewards) - i)
+        result[i] = np.sum( discounts * rewards[i:])
+
+    return result
+
+
+
+
+
+
 class GridParameters:
 
     def __init__(self, width, length, capacity):
