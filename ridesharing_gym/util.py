@@ -75,8 +75,8 @@ class GridParameters:
         """
         Computes the distance between two points using Euclidean dist.
         """
-        a = get_coord(origin)
-        b = get_coord(end)
+        a = self.get_coord(origin)
+        b = self.get_coord(end)
         dist = np.linalg.norm(a-b)
 
         return dist
