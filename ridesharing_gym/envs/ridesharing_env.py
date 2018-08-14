@@ -12,6 +12,7 @@ class RidesharingEnv(gym.Env):
         self.action_space = spaces.Discrete(6) # N,S,E,W, center, and reject
         # due to gym limitations must hardcode these parameters
         self.grid = GridParameters(5, 5, 20)
+        self.euclid = False
 
         init_state = np.zeros(25)
         init_state[12] = 10
@@ -79,13 +80,13 @@ class RidesharingEnv(gym.Env):
 
         return
 
-    def _get_reward(self, start, end, c=1, euclid=True):
+    def _get_reward(self, start, end, c=1):
         """
         Returns the reward score. 
         """
         dist = self.grid.get_dist(start, end)
         reward = dist * c
-        if not euclid:
+        if not self.euclid:
             reward = 1.0
             
         return reward
