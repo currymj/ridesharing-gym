@@ -22,6 +22,8 @@ for episode in range(N_EPISODES):
         act = sampling_policy.act(observed_state)
         acts.append(act)
         print('Randomly chosen action: {}'.format(act))
+        print('Prob of chosen action: {}'.format(sampling_policy.prob_of_action(observed_state, act)))
+        print('Gradient of prob of chosen action: {}'.format(sampling_policy.grad_prob_of_action(observed_state, act)))
         observed_state, reward, _, _ = env.step(act)
         rewards[t] = reward
     print(acts)
