@@ -41,30 +41,41 @@ class LogisticSamplingPolicy:
     def alpha(self):
         return scipy.special.expit(self.theta)
 
+    def _action_probs_array(self, observation):
+        probs_array = np.zeros(6)
+        cars, request = observation
+        source = request[0]
+        dest = request[1]
+
+        # if no capacity at destination, must reject
+        if cars[dest] >= self.grid.capacity:
+            probs_array[0] = 1.0
+            return probs_array
+
+
+        # check if can match center
+        center_index = self.grid.get_loc(source, 1)
+        if (center_index == -1) or (cars[center_index] == 0):
+            probs_array[0] += self.alpha
+        else:
+            probs_array[1] = self.alpha
+
+        # check if can match neighbors
+        neighbor_actions = [2,3,4,5]
+        for action in neighbor_actions:
+            act_index = self.grid.get_loc(source, action)
+            if (act_index == -1) or (cars[act_index] == 0):
+                probs_array[0] += (1.0 - self.alpha) / 4.0
+            else:
+                probs_array[action] = (1.0 - self.alpha) / 4.0
+
+        return probs_array
+
     def prob_of_action(self, observation, action):
-        raise NotImplementedError
+        return self._action_probs_array(observation)[action]
 
     def grad_prob_of_action(self, observation, action):
         raise NotImplementedError
 
     def act(self, observation):
-        cars, request = observation
-        source = request[0]
-        dest = request[1]
-
-        if cars[dest] >= self.grid.capacity:
-            return 0
-
-        action_choice = 1
-        if np.random.rand() > self.alpha:
-            action_choice = np.random.randint(4) + 2
-
-        chosen_index = self.grid.get_loc(source, action_choice)
-
-        if chosen_index == -1:
-            return 0 # reject
-
-        if cars[chosen_index] == 0:
-            return 0
-
-        return action_choice
+        return np.random.choice([0,1,2,3,4,5], p=self._action_probs_array(observation))
