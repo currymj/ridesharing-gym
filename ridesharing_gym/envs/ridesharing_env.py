@@ -21,7 +21,7 @@ class RidesharingEnv(gym.Env):
         # save the initial state for calls to self.reset()
         self.init_state = init_state.astype('int8')
 
-        self.grid_state = init_state.astype('int8')
+        self.grid_state = np.copy(init_state.astype('int8'))
 
         self.request_state = self._draw_request()
 
@@ -75,24 +75,24 @@ class RidesharingEnv(gym.Env):
             raise Exception('Illegal movement. Number of cars below zero from location ', location)
         elif update > self.grid.capacity:
             raise Exception('Illegal movement. Number of cars beyond capacity from location ', location)
-        else: 
+        else:
             self.grid_state[location] += change
 
         return
 
     def _get_reward(self, start, end, c=1):
         """
-        Returns the reward score. 
+        Returns the reward score.
         """
         dist = self.grid.get_dist(start, end)
         reward = dist * c
         if not self.euclid:
             reward = 1.0
-            
+
         return reward
 
     def reset(self):
-        self.grid_state = self.init_state
+        self.grid_state = np.copy(self.init_state)
         self.request_state = self._draw_request()
         return (np.copy(self.grid_state), np.copy(self.request_state))
 
