@@ -15,6 +15,7 @@ def discounted_episode_returns(rewards, gamma=0.999):
     with discount rate gamma (default 0.999).
     """
 
+    """
     def cumulative_discounts(length):
         res = np.zeros(length)
         res[0] = 1.0
@@ -28,10 +29,12 @@ def discounted_episode_returns(rewards, gamma=0.999):
         result[i] = np.sum( discounts * rewards[i:])
 
     return result
+    """
 
-
-
-
+    length = len(rewards)
+    discounts = [gamma**x for x in range(length)]
+    result = [np.dot(discounts[:length-i], rewards[i:]) for i in range(length)]
+    return result
 
 
 class GridParameters:
