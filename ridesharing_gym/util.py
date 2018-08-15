@@ -6,8 +6,6 @@ def undiscounted_episode_returns(rewards):
     """
     return np.cumsum(rewards[::-1])[::-1]
 
-# the following method could probably be made
-# much, much more efficient
 def discounted_episode_returns(rewards, gamma=0.999):
     """
     Given a sequence of rewards, returns the sequence
