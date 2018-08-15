@@ -21,7 +21,6 @@ def reinforce_episodic_update(sampling_policy, acts, states, rewards, lr=0.01):
 
 env = gym.make('ridesharing-v0')
 
-observed_state = env.reset()
 
 # for now just take the grid parameters directly out of env
 sampling_policy = ridesharing_gym.policies.LogisticSamplingPolicy(0.0, env.grid)
@@ -32,6 +31,7 @@ T_STEPS = 1000
 for episode in range(N_EPISODES):
     acts = []
     states = []
+    observed_state = env.reset()
     rewards = np.zeros(T_STEPS)
     for t in range(T_STEPS):
         states.append(observed_state)
