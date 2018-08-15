@@ -56,7 +56,7 @@ class RidesharingEnv(gym.Env):
         # draw new request
         self.request_state = self._draw_request()
 
-        return ((self.grid_state, self.request_state),
+        return ((np.copy(self.grid_state), np.copy(self.request_state)),
                 reward,
                 False, # for now, don't worry about episodes
                 {})
