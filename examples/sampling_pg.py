@@ -4,16 +4,17 @@ from ridesharing_gym.util import discounted_episode_returns
 import numpy as np
 
 
-def reinforce_episodic_update(sampling_policy, acts, states, rewards, lr=0.01):
-    returns = discounted_episode_returns(rewards)
+def reinforce_episodic_update(sampling_policy, acts, states, rewards, lr=0.01, gamma=0.999):
+    returns = discounted_episode_returns(rewards, gamma)
     for t in range(len(acts)):
         #print('t: {}, alpha: {}, theta:{}'.format(t, sampling_policy.alpha, sampling_policy.theta))
         #print('State: {}', states[t])
         #print('Action taken: {}', acts[t])
         grad_val = sampling_policy.grad_prob_of_action(states[t], acts[t])
         prob_val = sampling_policy.prob_of_action(states[t], acts[t])
-        update_term = lr * (returns[t] *
-                                       (grad_val / prob_val))
+        update_term = lr * ((gamma**t) * 
+        					returns[t] * 
+        					(grad_val / prob_val))
         sampling_policy.theta += update_term
         #print('update: {}, Gradient: {}, Probability: {}'.format(update_term, grad_val, prob_val))
 
