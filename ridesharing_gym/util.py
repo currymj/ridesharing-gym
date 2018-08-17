@@ -22,8 +22,15 @@ def discounted_episode_returns(rewards, gamma=0.999):
 
 def state_to_index(state, env):
     """
-    not done
+    In case memory is an issue, try the following:
+    1. map state to number
+    2. store all numbers to array
+    3. convert
+    For now, we use a big array to store state and index pair
     """
+    
+
+
 
 class GridParameters:
 
