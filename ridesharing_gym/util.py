@@ -1,4 +1,5 @@
 import numpy as np
+
 def undiscounted_episode_returns(rewards):
     """
     Given a sequence of rewards, returns the sequence
@@ -18,6 +19,11 @@ def discounted_episode_returns(rewards, gamma=0.999):
     result = [np.dot(discounts[:length-i], rewards[i:]) for i in range(length)]
     return result
 
+
+def state_to_index(state, env):
+    """
+    not done
+    """
 
 class GridParameters:
 
