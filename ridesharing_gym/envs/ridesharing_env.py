@@ -11,11 +11,11 @@ class RidesharingEnv(gym.Env):
 
         self.action_space = spaces.Discrete(6) # N,S,E,W, center, and reject
         # due to gym limitations must hardcode these parameters
-        self.grid = GridParameters(5, 5, 20)
+        self.grid = GridParameters(2, 2, 1)
         self.euclid = False
 
         init_state = np.zeros(self.grid.grid_size)
-        init_state[12] = 10
+        init_state[2] = 1
         #init_state = 4*np.ones(25)
 
         # save the initial state for calls to self.reset()
@@ -41,7 +41,7 @@ class RidesharingEnv(gym.Env):
         Return for each pair a list of (probability, next state and reward) tuple
         """
 
-        num_states = self.observation_space.n
+        num_states = self._get_num_states()
         num_actions = self.action_space.n
         grid_size = self.grid.grid_size
 
@@ -61,6 +61,13 @@ class RidesharingEnv(gym.Env):
         return P
 
 
+    def _get_num_states(self):
+        g = self.grid.grid_size
+        c = self.grid.capacity
+        num_states = (c**g)*g*g
+        return num_states
+
+
     def _step_index(self, index, action, request):
         """
         Given state index, action and request
@@ -68,7 +75,8 @@ class RidesharingEnv(gym.Env):
         """
         self.grid_state = self.f_map[index][0] 
         self.request_state = self.f_map[index][1] 
-        next_state, reward, _, _ = self.step()
+        next_state, reward, _, _ = self.step(action)
+        next_state = (tuple(next_state[0]), tuple(next_state[1]))
         next_index = self.b_map[next_state]
 
         return next_index, reward
@@ -100,7 +108,7 @@ class RidesharingEnv(gym.Env):
         #if f == 'Pois':
         #not done
 
-        return np.random.randint(self.gird.grid_size, size=2, dtype='int8')
+        return np.random.randint(self.grid.grid_size, size=2, dtype='int8')
 
 
     def step(self, action):
