@@ -40,15 +40,30 @@ class RidesharingEnv(gym.Env):
 
         num_state = self.observation_space.n
         num_action = self.action_space.n
+        grid_size = self.grid.grid_size
 
         #initialize the P matrix
         P = np.zeros((num_state, num_action), dtype=object)
 
         for s in range(num_state):
             for a in range(num_action):
-                P[s][a] = 
+                P[s][a] = []
+                for r in range(np.ndindex((grid_size, grid_size)):
+                    prob = (1.0/grid_size)**2
+                    next_state = 
+                    loc = self.grid.get_loc(r[0], a)
+                    reward = self._get_reward(loc, r[1])
+                    P[s][a].append((prob, next_state, reward))
 
         return P
+
+
+    def _next_state_index(self, index, action, request):
+        """
+        Given state index, action, request
+        Returns a new state index
+        """
+
 
 
     def _get_maps(self):
@@ -82,7 +97,7 @@ class RidesharingEnv(gym.Env):
         reward = 0.0
 
         request_start = self.request_state[0]
-        request_end = self.request_state[1]
+        request_end = self.request_state [1]
 
         loc = self.grid.get_loc(request_start, action)
 
