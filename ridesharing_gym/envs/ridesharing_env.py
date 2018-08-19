@@ -21,49 +21,68 @@ class RidesharingEnv(gym.Env):
         # save the initial state for calls to self.reset()
         self.init_state = init_state.astype('int8')
 
-        self.grid_state = np.copy(init_state.astype('int8'))
-
         self.request_state = self._draw_request()
 
         self.observation_space = spaces.Tuple((spaces.MultiDiscrete(np.tile(self.grid.capacity, self.grid.grid_size)), 
                                                spaces.MultiDiscrete(np.array([self.grid.grid_size, self.grid.grid_size]))))
+
+        self.f_map, self.b_map = self._get_maps()
+
         self.P = self._get_P()
         
-        self.f_map, self.b_map = self._get_maps()
+        self.grid_state = np.copy(init_state.astype('int8'))
 
 
     def _get_P(self):
         """
         Returns a transition function for a given state action pair
-        Return for each pair the probability, next state and reward
+        Return for each pair the tuple of probability, next state and reward
         """
 
-        num_state = self.observation_space.n
-        num_action = self.action_space.n
+        num_states = self.observation_space.n
+        num_actions = self.action_space.n
         grid_size = self.grid.grid_size
 
-        #initialize the P matrix
-        P = np.zeros((num_state, num_action), dtype=object)
+        #initialize the transition matrix
+        P = np.zeros((num_states, num_actions), dtype=object)
 
-        for s in range(num_state):
-            for a in range(num_action):
+        #loop over state-action pairs
+        for s in range(num_states):
+            for a in range(num_actions):
                 P[s][a] = []
-                for r in range(np.ndindex((grid_size, grid_size)):
-                    prob = (1.0/grid_size)**2
-                    next_state = 
-                    loc = self.grid.get_loc(r[0], a)
+                #loop over requests
+                for r in np.ndindex((grid_size, grid_size)):
+                    prob = (1.0/grid_size)**2 #this will change for non-uniform distribution
+                    next_state = self._next_state_index(s, a, r)
+                    loc = self.grid.get_loc(r[0], a) #start location
                     reward = self._get_reward(loc, r[1])
                     P[s][a].append((prob, next_state, reward))
-
+        
         return P
 
 
     def _next_state_index(self, index, action, request):
         """
-        Given state index, action, request
+        Given state index, action and request
         Returns a new state index
         """
+        
+        #store initial grid
+        self.grid_state = self.f_map[index][0] 
+        #store initial request
+        init_request = self.f_map[index][1] 
+        loc = self.grid.get_loc(init_request[0], action)
 
+        #perform step based on action and request
+        if action == 0:
+            pass
+        else:
+            self._update_car(loc, -1)
+            self._update_car(init_request[1], 1)
+
+        next_index = self.b_map[(self.grid_state, request)]
+
+        return next_index
 
 
     def _get_maps(self):
@@ -84,11 +103,13 @@ class RidesharingEnv(gym.Env):
         return f_map, b_map
 
 
-    def _draw_request(self):
+    def _draw_request(self, f=Unif):
         """
         A method to randomly sample a request between two pairs of locations.
         Currently, draws uniformly at random.
         """
+        #if f == 'Pois':
+
         return np.random.randint(self.gird.grid_size, size=2, dtype='int8')
 
 
