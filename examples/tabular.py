@@ -10,9 +10,8 @@ def valueIteration(env, gamma=0.999, loop=1000, epsilon=0.001, diff=-1.0):
     """
     Implementing value iteration
     """
-
-	num_states = env.observation_space.n
-	num_actions = env.action_space.n
+    num_states = env.observation_space.n
+    num_actions = env.action_space.n
     vf = np.zeros(num_states) #value function
     
     
@@ -33,3 +32,5 @@ def valueIteration(env, gamma=0.999, loop=1000, epsilon=0.001, diff=-1.0):
             break
         diff = np.abs(np.sum(vf_p - vf))
     return vf
+
+valueIteration(env)
