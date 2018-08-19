@@ -1,13 +1,12 @@
 import gym
 import ridesharing_gym
-from ridesharing_gym.util import state_to_index
 import numpy as np
 
 
 env = gym.make('ridesharing-v0')
 
 
-def valueIteration(env, gamma=0.999):
+def valueIteration(env, gamma=0.999, loop=1000, epsilon=0.001, diff=-1.0):
     """
     Implementing value iteration
     """
@@ -15,9 +14,7 @@ def valueIteration(env, gamma=0.999):
 	num_states = env.observation_space.n
 	num_actions = env.action_space.n
     vf = np.zeros(num_states) #value function
-    loop = 1000
-    epsilon = 0.001
-    diff = -1.0
+    
     
     for i in range(lopp):
         vf_p = np.copy(vf) #previous value function
@@ -27,7 +24,7 @@ def valueIteration(env, gamma=0.999):
                 next_rewards = []
                 for next_tuple in env.P[s][a]: 
                     prob, next_state, reward = next_tuple 
-                    next_rewards.append((prob * (reward + vf_p[next_state])))
+                    next_rewards.append((prob * (reward + gamma*vf_p[next_state])))
                 Q_sa.append(np.sum(next_rewards))
             vf[s] = max(Q_sa)
             
