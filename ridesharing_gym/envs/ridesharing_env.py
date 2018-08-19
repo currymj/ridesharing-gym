@@ -21,7 +21,6 @@ class RidesharingEnv(gym.Env):
         # save the initial state for calls to self.reset()
         self.init_state = init_state.astype('int8')
 
-        self.request_state = self._draw_request()
 
         self.observation_space = spaces.Tuple((spaces.MultiDiscrete(np.tile(self.grid.capacity, self.grid.grid_size)), 
                                                spaces.MultiDiscrete(np.array([self.grid.grid_size, self.grid.grid_size]))))
@@ -31,6 +30,9 @@ class RidesharingEnv(gym.Env):
         self.P = self._get_P()
         
         self.grid_state = np.copy(init_state.astype('int8'))
+
+        self.request_state = self._draw_request()
+
 
 
     def _get_P(self):
@@ -53,36 +55,23 @@ class RidesharingEnv(gym.Env):
                 #loop over requests
                 for r in np.ndindex((grid_size, grid_size)):
                     prob = (1.0/grid_size)**2 #this will change for non-uniform distribution
-                    next_state = self._next_state_index(s, a, r)
-                    loc = self.grid.get_loc(r[0], a) #start location
-                    reward = self._get_reward(loc, r[1])
+                    next_state, reward = self._step_index(s, a, r)
                     P[s][a].append((prob, next_state, reward))
         
         return P
 
 
-    def _next_state_index(self, index, action, request):
+    def _step_index(self, index, action, request):
         """
         Given state index, action and request
         Returns a new state index
         """
-        
-        #store initial grid
         self.grid_state = self.f_map[index][0] 
-        #store initial request
-        init_request = self.f_map[index][1] 
-        loc = self.grid.get_loc(init_request[0], action)
+        self.request_state = self.f_map[index][1] 
+        next_state, reward, _, _ = self.step()
+        next_index = self.b_map[next_state]
 
-        #perform step based on action and request
-        if action == 0:
-            pass
-        else:
-            self._update_car(loc, -1)
-            self._update_car(init_request[1], 1)
-
-        next_index = self.b_map[(self.grid_state, request)]
-
-        return next_index
+        return next_index, reward
 
 
     def _get_maps(self):
