@@ -27,8 +27,9 @@ class RidesharingEnv(gym.Env):
 
         self.observation_space = spaces.Tuple((spaces.MultiDiscrete(np.tile(self.grid.capacity, self.grid.grid_size)), 
                                                spaces.MultiDiscrete(np.array([self.grid.grid_size, self.grid.grid_size]))))
-        self.P = _get_P()
-        # not done
+        self.P = self._get_P()
+        
+        self.f_map, self.b_map = self._get_maps()
 
 
     def _get_P(self):
@@ -36,9 +37,25 @@ class RidesharingEnv(gym.Env):
         Returns a transition function for a given state action pair
         Return for each pair the probability, next state and reward
         """
-        # not done
 
-        return P
+
+    def _get_maps(self):
+        """
+        Iterate over all states
+        Returns forward and backward mapping of state and index
+        """
+        c = self.grid.capacity
+        s = self.grid.grid_size
+
+        # matrix of all states
+        states = [(i, x) for i in np.ndindex(tuple(np.tile(c, s))) for x in np.ndindex(s, s)]
+        
+        #forward and backward mapping of state and index
+        f_map = dict(enumerate(states))
+        b_map = {v: k for k, v in f_map.items()}
+
+        return f_map, b_map
+
 
     def _draw_request(self):
         """

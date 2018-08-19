@@ -7,7 +7,7 @@ import numpy as np
 env = gym.make('ridesharing-v0')
 
 
-def tabular(env, gamma=0.999):
+def valueIteration(env, gamma=0.999):
     """
     Implementing value iteration
     """
