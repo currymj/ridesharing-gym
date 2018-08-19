@@ -14,7 +14,7 @@ class RidesharingEnv(gym.Env):
         self.grid = GridParameters(5, 5, 20)
         self.euclid = False
 
-        init_state = np.zeros(25)
+        init_state = np.zeros(self.grid.grid_size)
         init_state[12] = 10
         #init_state = 4*np.ones(25)
 
@@ -37,6 +37,18 @@ class RidesharingEnv(gym.Env):
         Returns a transition function for a given state action pair
         Return for each pair the probability, next state and reward
         """
+
+        num_state = self.observation_space.n
+        num_action = self.action_space.n
+
+        #initialize the P matrix
+        P = np.zeros((num_state, num_action), dtype=object)
+
+        for s in range(num_state):
+            for a in range(num_action):
+                P[s][a] = 
+
+        return P
 
 
     def _get_maps(self):
@@ -62,7 +74,7 @@ class RidesharingEnv(gym.Env):
         A method to randomly sample a request between two pairs of locations.
         Currently, draws uniformly at random.
         """
-        return np.random.randint(25, size=2, dtype='int8')
+        return np.random.randint(self.gird.grid_size, size=2, dtype='int8')
 
 
     def step(self, action):
