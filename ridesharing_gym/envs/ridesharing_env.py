@@ -36,7 +36,7 @@ class RidesharingEnv(gym.Env):
     def _get_P(self):
         """
         Returns a transition function for a given state action pair
-        Return for each pair the tuple of probability, next state and reward
+        Return for each pair a list of (probability, next state and reward) tuple
         """
 
         num_states = self.observation_space.n
@@ -103,12 +103,13 @@ class RidesharingEnv(gym.Env):
         return f_map, b_map
 
 
-    def _draw_request(self, f=Unif):
+    def _draw_request(self, f='Unif'):
         """
         A method to randomly sample a request between two pairs of locations.
-        Currently, draws uniformly at random.
+        Default is to draw uniformly at random.
         """
         #if f == 'Pois':
+        #not done
 
         return np.random.randint(self.gird.grid_size, size=2, dtype='int8')
 
