@@ -34,10 +34,8 @@ def valueIteration(env, gamma=0.9, loop=10000, epsilon=0.1, diff=100):
         diff = np.abs(np.sum(vf_p - vf))
     return vf
 
-valueIteration(env)
 
-
-def get_policy(vf, gamma=0.999):
+def get_policy(env, vf, gamma=0.999):
     '''
     Returns policy given the value function
     '''
@@ -53,7 +51,12 @@ def get_policy(vf, gamma=0.999):
                 Q_sa[a] += (prob * (reward + gamma * vf[next_state]))
         policy[s] = np.argmax(Q_sa)
     
-    return policy
+    retern policy
+
+
+vf = valueIteration(env)
+opt_policy = get_policy(env, vf)
+print(opt_policy)
 
 
 
