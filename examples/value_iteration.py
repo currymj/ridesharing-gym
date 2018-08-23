@@ -35,3 +35,28 @@ def valueIteration(env, gamma=0.999, loop=1000, epsilon=0.0000001, diff=-1.0):
     return vf
 
 valueIteration(env)
+
+
+def get_policy(vf, gamma=0.999):
+    '''
+    Returns policy given the value function
+    '''
+    num_states = env._get_num_states()
+    num_actions = env.action_space.n
+    policy = np.zeros(num_states) 
+    
+    for s in range(num_states):
+        Q_sa = np.zeros(num_actions)
+        for a in range(num_actions):
+            for next_tuple in env.P[s][a]:
+                prob, next_state, reward = next_tuple
+                Q_sa[a] += (prob * (reward + gamma * vf[next_state]))
+        policy[s] = np.argmax(Q_sa)
+    
+    return policy
+
+
+
+
+
+
