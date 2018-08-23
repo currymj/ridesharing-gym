@@ -32,6 +32,6 @@ def valueIteration(env, gamma=0.999, loop=1000, epsilon=0.0000001, diff=-1.0):
             print('Converges at iteration %d' % (i+1))
             break
         diff = np.abs(np.sum(vf_p - vf))
-    print(vf)
+    return vf
 
 valueIteration(env)
