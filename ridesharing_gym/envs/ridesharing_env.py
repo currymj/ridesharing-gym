@@ -57,7 +57,6 @@ class RidesharingEnv(gym.Env):
                 P[s][a] = []
                 #update P only if legal moves
                 if self._legal_moves(s, a):
-                    print(s, a)
                     #loop over requests
                     for r in np.ndindex((grid_size, grid_size)):
                         prob = (1.0/grid_size)**2 #this will change for non-uniform distribution
@@ -69,7 +68,7 @@ class RidesharingEnv(gym.Env):
 
     def _get_num_states(self):
         g = self.grid.grid_size
-        c = self.grid.capacity
+        c = self.grid.capacity + 1
         num_states = (c**g)*g*g
         return num_states
 
@@ -79,8 +78,8 @@ class RidesharingEnv(gym.Env):
         Given state index, action and request
         Returns a new state index
         """
-        self.grid_state = self.f_map[index][0] 
-        self.request_state = self.f_map[index][1] 
+        self.grid_state = np.asarray(self.f_map[index][0])
+        self.request_state = np.asarray(self.f_map[index][1])
         next_state, reward, _, _ = self.step(action)
         next_state = (tuple(next_state[0]), tuple(next_state[1]))
         next_index = self.b_map[next_state]
@@ -93,7 +92,7 @@ class RidesharingEnv(gym.Env):
         Iterate over all states
         Returns forward and backward mapping of state and index
         """
-        c = self.grid.capacity
+        c = self.grid.capacity + 1
         s = self.grid.grid_size
 
         # matrix of all states
@@ -109,9 +108,8 @@ class RidesharingEnv(gym.Env):
         """
         Returns False if illegal moves
         """
-        self.grid_state = self.f_map[state_index][0]
-        self.request_state = self.f_map[state_index][1]
-        print(self.grid_state, self.request_state)
+        self.grid_state = np.asarray(self.f_map[state_index][0])
+        self.request_state = np.asarray(self.f_map[state_index][1])
         try:    
             self.step(action)
             return True
@@ -138,7 +136,6 @@ class RidesharingEnv(gym.Env):
         request_end = self.request_state [1]
 
         loc = self.grid.get_loc(request_start, action)
-        print(loc)
         # move cars around if needed
         if action == 0: # reject
             pass
