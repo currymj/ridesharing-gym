@@ -6,16 +6,17 @@ from ridesharing_gym.util import GridParameters
 
 class RidesharingEnv(gym.Env):
 
-
     def __init__(self):
 
         self.action_space = spaces.Discrete(6) # N,S,E,W, center, and reject
         # due to gym limitations must hardcode these parameters
-        self.grid = GridParameters(2, 2, 1)
+        self.grid = GridParameters(2, 2, 2)
         self.euclid = False
 
         init_state = np.zeros(self.grid.grid_size)
-        init_state[2] = 1
+        init_state[0] = 2
+        init_state[1] = 2
+        init_state[2] = 2
         #init_state = 4*np.ones(25)
 
         # save the initial state for calls to self.reset()
@@ -32,6 +33,8 @@ class RidesharingEnv(gym.Env):
         self.grid_state = np.copy(init_state.astype('int8'))
 
         self.request_state = self._draw_request()
+
+
 
 
 
@@ -52,11 +55,14 @@ class RidesharingEnv(gym.Env):
         for s in range(num_states):
             for a in range(num_actions):
                 P[s][a] = []
-                #loop over requests
-                for r in np.ndindex((grid_size, grid_size)):
-                    prob = (1.0/grid_size)**2 #this will change for non-uniform distribution
-                    next_state, reward = self._step_index(s, a, r)
-                    P[s][a].append((prob, next_state, reward))
+                #update P only if legal moves
+                if self._legal_moves(s, a):
+                    print(s, a)
+                    #loop over requests
+                    for r in np.ndindex((grid_size, grid_size)):
+                        prob = (1.0/grid_size)**2 #this will change for non-uniform distribution
+                        next_state, reward = self._step_index(s, a, r)
+                        P[s][a].append((prob, next_state, reward))
         
         return P
 
@@ -99,6 +105,19 @@ class RidesharingEnv(gym.Env):
 
         return f_map, b_map
 
+    def _legal_moves(self, state_index, action):
+        """
+        Returns False if illegal moves
+        """
+        self.grid_state = self.f_map[state_index][0]
+        self.request_state = self.f_map[state_index][1]
+        print(self.grid_state, self.request_state)
+        try:    
+            self.step(action)
+            return True
+        except:
+            return False
+
 
     def _draw_request(self, f='Unif'):
         """
@@ -119,7 +138,7 @@ class RidesharingEnv(gym.Env):
         request_end = self.request_state [1]
 
         loc = self.grid.get_loc(request_start, action)
-
+        print(loc)
         # move cars around if needed
         if action == 0: # reject
             pass
