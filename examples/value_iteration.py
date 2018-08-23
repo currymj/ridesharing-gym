@@ -56,7 +56,7 @@ def get_policy(env, vf, gamma=0.9):
 
 vf = valueIteration(env)
 opt_policy = get_policy(env, vf)
-print(list(opt_policy))
+print(opt_policy)
 
 
 
