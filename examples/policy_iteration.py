@@ -45,13 +45,37 @@ def policy_to_mat(policy):
 	return policy_prob
 
 
-def policyIter():
+def policyIter(env, gamma=0.9):
 	"""
 	method for policy iteration
 	"""
 	
 	num_states = env._get_num_states()
 	num_actions = env.action_space.n
+
+	policy_prob = np.zeros((num_states, num_actions))
+
+    while True:
+
+    	vf = policyEva(policy_prob, env)
+    	
+    	policy_stable = True
+    
+	    for s in range(num_states):
+	    	cur_a = np.argmax(policy_prob[s])
+	    	value = np.zeros(num_actions)
+	            
+            for a in range(num_actions):
+                for prob, next_state, reward in env.P[s][a]:
+                    value[a] += prob * (reward + gamma * vf[next_state])
+            best_a = np.argmax(value)
+
+		    if cur_a != best_a:
+		    	policy_stable = False
+
+			policy_prob[s] = np.eye(num_actions)[best_a]
+
+		return policy_prob, vf if policy_stable
 
 
 vf = valueIteration(env)
