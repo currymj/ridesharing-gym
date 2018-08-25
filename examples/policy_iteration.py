@@ -80,9 +80,9 @@ def policyIter(env, gamma=0.9):
         if policy_stable: return policy_prob, vf 
 
 
-# vf = valueIteration(env)
-# opt_policy = get_policy(env, vf)
-# policy_prob = policy_to_mat(opt_policy)
+vf = valueIteration(env)
+opt_policy = get_policy(env, vf)
+policy_prob = policy_to_mat(opt_policy)
 # policy_evaluation = policyEva(policy_prob, env)
 # print(policy_evaluation)
 
