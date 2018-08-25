@@ -47,6 +47,19 @@ def policy_to_mat(policy):
     return policy_prob
 
 
+def mat_to_policy(policy_prob):
+    """
+    method to convert a policy matrix of num_states by num_action
+    return a vector of the policy
+    """
+
+    num_states = policy_prob.shape[0]
+
+    policy = [np.where(policy_prob[i]) for i in range(num_states)] 
+
+    return np.array(policy)
+
+
 def policyIter(env, gamma=0.9):
     """
     method for policy iteration
@@ -83,9 +96,11 @@ def policyIter(env, gamma=0.9):
 vf = valueIteration(env)
 opt_policy = get_policy(env, vf)
 policy_prob = policy_to_mat(opt_policy)
+policy = mat_to_policy(policy_prob)
+if policy.all() == opt_policy.all():
+    print("Yeah same!")
 # policy_evaluation = policyEva(policy_prob, env)
 # print(policy_evaluation)
 
-
-policy_prob, vf = policyIter(env)
-print(policy_prob)
+# policy_prob, vf = policyIter(env)
+# print(policy_prob)
