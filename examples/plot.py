@@ -16,3 +16,7 @@ for i in range(10):
     loc_vec[i] = loc
 
 
+counts = [loc_vector.count(x) for x in range(4)]
+counts = np.array(counts)
+count_matrix = counts.reshape(2, 2)
+ax = sns.heatmap(count_matrix)
