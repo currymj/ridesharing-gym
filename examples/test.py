@@ -13,3 +13,6 @@ for i in range(10):
     act = sampling_policy.act(observed_state)
     print('Randomly chosen action: {}'.format(act))
     observed_state, reward, _, _ = env.step(act)
+
+
+

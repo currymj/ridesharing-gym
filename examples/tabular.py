@@ -1,7 +1,6 @@
 import gym
 import ridesharing_gym
-import numpy as np
-import random
+import numpy as np; np.random.seed(0)
 
 env = gym.make('ridesharing-v0')
 
@@ -57,8 +56,6 @@ def get_policy(env, vf, gamma=0.9):
 # vf = valueIteration(env)
 # opt_policy = get_policy(env, vf)
 # print(opt_policy)
-
-
 
 
 
@@ -150,21 +147,18 @@ def policyIter(env, gamma=0.9):
         if policy_stable or count < 10: return policy_prob, vf 
 
 
-random.seed(12)
-vf = valueIteration(env)
-opt_policy1 = get_policy(env, vf)
-policy_prob1 = policy_to_mat(opt_policy1)
+# vf = valueIteration(env)
+# opt_policy1 = get_policy(env, vf)
+# policy_prob1 = policy_to_mat(opt_policy1)
 
-policy_prob2, vf = policyIter(env)
-opt_policy2 = mat_to_policy(policy_prob2)
+# policy_prob2, vf = policyIter(env)
+# opt_policy2 = mat_to_policy(policy_prob2)
 
-count = 0
-eva1 = policyEva(policy_prob1, env)
-eva2 = policyEva(policy_prob2, env)
-for s in range(env._get_num_states()):
-    print(eva1[s]-eva2[s])
-
-
+# count = 0
+# eva1 = policyEva(policy_prob1, env)
+# eva2 = policyEva(policy_prob2, env)
+# for s in range(env._get_num_states()):
+#     print(eva1[s]-eva2[s])
 
 # policy_prob = policy_to_mat(opt_policy)
 # policy = mat_to_policy(policy_prob)

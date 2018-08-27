@@ -104,6 +104,7 @@ class RidesharingEnv(gym.Env):
 
         return f_map, b_map
 
+
     def _legal_moves(self, state_index, action):
         """
         Returns False if illegal moves
@@ -128,7 +129,7 @@ class RidesharingEnv(gym.Env):
         return np.random.randint(self.grid.grid_size, size=2, dtype='int8')
 
 
-    def step(self, action):
+    def step(self, action, detail=False):
         assert self.action_space.contains(action)
         reward = 0.0
 
@@ -147,10 +148,22 @@ class RidesharingEnv(gym.Env):
         # draw new request
         self.request_state = self._draw_request()
 
-        return ((np.copy(self.grid_state), np.copy(self.request_state)),
-                reward,
-                False, # for now, don't worry about episodes
-                {})
+        next_state = (tuple(self.grid_state), tuple(self.request_state))
+        observed_state_index = self.b_map[next_state]
+
+        if detail: return ((np.copy(self.grid_state), 
+                            np.copy(self.request_state)),
+                            reward,
+                            False, # for now, don't worry about episodes
+                            {},
+                            observed_state_index,
+                            loc)
+        else: return ((np.copy(self.grid_state), 
+                       np.copy(self.request_state)),
+                       reward,
+                       False, # for now, don't worry about episodes
+                       {})
+
 
     def _update_car(self, location, change):
         """
@@ -170,6 +183,7 @@ class RidesharingEnv(gym.Env):
 
         return
 
+
     def _get_reward(self, start, end, c=1):
         """
         Returns the reward score.
@@ -181,10 +195,12 @@ class RidesharingEnv(gym.Env):
 
         return reward
 
+
     def reset(self):
         self.grid_state = np.copy(self.init_state)
         self.request_state = self._draw_request()
         return (np.copy(self.grid_state), np.copy(self.request_state))
+
 
     def render(self, mode='human'):
         raise NotImplementedError
