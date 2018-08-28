@@ -15,9 +15,9 @@ class RidesharingEnv(gym.Env):
 
         init_state = np.zeros(self.grid.grid_size)
         init_state[0] = 1
-        init_state[1] = 1
-        init_state[2] = 1
-        init_state[3] = 1 
+        init_state[1] = 0
+        init_state[2] = 0
+        init_state[3] = 0 
         #init_state = 4*np.ones(25)
 
         # save the initial state for calls to self.reset()
