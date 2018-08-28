@@ -14,9 +14,10 @@ class RidesharingEnv(gym.Env):
         self.euclid = False
 
         init_state = np.zeros(self.grid.grid_size)
-        init_state[0] = 2
-        init_state[1] = 2
-        init_state[2] = 2
+        init_state[0] = 1
+        init_state[1] = 1
+        init_state[2] = 1
+        init_state[3] = 1 
         #init_state = 4*np.ones(25)
 
         # save the initial state for calls to self.reset()
@@ -157,7 +158,8 @@ class RidesharingEnv(gym.Env):
                             False, # for now, don't worry about episodes
                             {},
                             observed_state_index,
-                            loc)
+                            loc,
+                            request_end)
         else: return ((np.copy(self.grid_state), 
                        np.copy(self.request_state)),
                        reward,

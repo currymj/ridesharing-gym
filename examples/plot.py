@@ -9,17 +9,20 @@ opt_policy = get_policy(env, vf)
 
 observed_state = env.reset()
 observed_state_index = env.b_map[(tuple(observed_state[0]), tuple(observed_state[1]))]
-loc_vec = []
+loc_vec, end_vec = [], []
 
 for i in range(30):
     action = int(opt_policy[observed_state_index])
-    _, _, _, _, observed_state_index, loc = env.step(action, detail=True)
+    _, _, _, _, observed_state_index, loc, request_end = env.step(action, detail=True)
     loc_vec.append(loc)
+    end_vec.append(request_end)
 
+def vec_to_fig(input_vector, fig_name):
+	counts = np.array([input_vector.count(x) for x in range(4)]).reshape(2, 2)
+	map = sns.heatmap(counts)
+	fig = map.get_figure()
+	fig.savefig("examples/figures/" + fig_name + ".png")
+	fig.clf()
 
-counts = [loc_vec.count(x) for x in range(4)]
-counts = np.array(counts)
-count_matrix = counts.reshape(2, 2)
-starting_loc_map = sns.heatmap(count_matrix)
-starting_loc_fig = starting_loc_map.get_figure()
-starting_loc_fig.savefig("starting_map.png")
+vec_to_fig(end_vec, "ending_map")
+vec_to_fig(loc_vec, "starting_map")
