@@ -10,7 +10,7 @@ class RidesharingEnv(gym.Env):
 
         self.action_space = spaces.Discrete(6) # N,S,E,W, center, and reject
         # due to gym limitations must hardcode these parameters
-        self.grid = GridParameters(2, 2, 2)
+        self.grid = GridParameters(3, 3, 2)
         self.euclid = False
 
         init_state = np.zeros(self.grid.grid_size)
@@ -54,6 +54,7 @@ class RidesharingEnv(gym.Env):
 
         #loop over state-action pairs
         for s in range(num_states):
+            print(s / 1594323 * 100)
             for a in range(num_actions):
                 P[s][a] = []
                 #update P only if legal moves
@@ -63,7 +64,6 @@ class RidesharingEnv(gym.Env):
                         prob = (1.0/grid_size)**2 #this will change for non-uniform distribution
                         next_state, reward = self._step_index(s, a, r)
                         P[s][a].append((prob, next_state, reward))
-        
         return P
 
 
