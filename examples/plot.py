@@ -1,3 +1,5 @@
+import matplotlib
+matplotlib.use('Agg')
 import numpy as np; np.random.seed(0)
 import seaborn as sns; sns.set()
 from tabular import *
