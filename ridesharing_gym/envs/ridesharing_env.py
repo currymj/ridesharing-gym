@@ -3,7 +3,6 @@ import gym.spaces as spaces
 import numpy as np
 from ridesharing_gym.util import GridParameters
 from joblib import Parallel, delayed
-import multiprocessing
 
 class RidesharingEnv(gym.Env):
 
@@ -50,17 +49,12 @@ class RidesharingEnv(gym.Env):
         #initialize the transition matrix
         self.P = np.zeros((num_states, num_actions), dtype=object)
 
-        #run parallel 
-        state_space = range(num_states)
-        num_cores = multiprocessing.cpu_count()
-        Parallel(n_jobs=num_cores)(delayed(self._single_state_P)(s) for s in state_space)   
+        #run parallel across actions
+        Parallel(n_jobs=6)(delayed(self._single_a_P)(a, num_states, grid_size) for a in range(num_actions))   
 
-
-    def _single_state_P(self, s):
-        num_actions = self.action_space.n
-        grid_size = self.grid.grid_size
-        print(s / 1594323 * 100)
-        for a in range(num_actions):
+    def _single_a_P(self, a, num_states, grid_size):
+        for s in range(num_states):
+            print(s / 1594323 * 100)
             self.P[s][a] = []
             if self._legal_moves(s, a):
                 #loop over requests
@@ -68,7 +62,6 @@ class RidesharingEnv(gym.Env):
                     prob = (1.0/grid_size)**2 
                     next_state, reward = self._step_index(s, a, r)
                     self.P[s][a].append((prob, next_state, reward))
-
 
     def _get_num_states(self):
         g = self.grid.grid_size
