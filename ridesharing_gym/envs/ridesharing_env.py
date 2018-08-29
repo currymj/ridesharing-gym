@@ -59,7 +59,7 @@ class RidesharingEnv(gym.Env):
     def _single_state_P(self, s):
         num_actions = self.action_space.n
         grid_size = self.grid.grid_size
-        print(s / 1594323)
+        print(s / 1594323 * 100)
         for a in range(num_actions):
             self.P[s][a] = []
             if self._legal_moves(s, a):
