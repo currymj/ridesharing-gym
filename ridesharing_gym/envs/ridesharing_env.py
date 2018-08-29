@@ -53,13 +53,13 @@ class RidesharingEnv(gym.Env):
         Parallel(n_jobs=6)(delayed(self._single_a_P)(a, num_states, grid_size) for a in range(num_actions))   
 
     def _single_a_P(self, a, num_states, grid_size):
+        prob = (1.0/grid_size)**2 
         for s in range(num_states):
-            print(s / 1594323 * 100)
+            print(s / 1594323 * 100, a)
             self.P[s][a] = []
             if self._legal_moves(s, a):
                 #loop over requests
                 for r in np.ndindex((grid_size, grid_size)):
-                    prob = (1.0/grid_size)**2 
                     next_state, reward = self._step_index(s, a, r)
                     self.P[s][a].append((prob, next_state, reward))
 
