@@ -52,10 +52,12 @@ class RidesharingEnv(gym.Env):
         #run parallel across actions
         Parallel(n_jobs=6)(delayed(self._single_a_P)(a, num_states, grid_size) for a in range(num_actions))   
 
+
     def _single_a_P(self, a, num_states, grid_size):
+        
         prob = (1.0/grid_size)**2 
         for s in range(num_states):
-            print(s / 1594323 * 100, a)
+            print(s / num_states * 100, a)
             self.P[s][a] = []
             if self._legal_moves(s, a):
                 #loop over requests
@@ -63,7 +65,11 @@ class RidesharingEnv(gym.Env):
                     next_state, reward = self._step_index(s, a, r)
                     self.P[s][a].append((prob, next_state, reward))
 
+
     def _get_num_states(self):
+        """
+        Computes the number of states
+        """
         g = self.grid.grid_size
         c = self.grid.capacity + 1
         num_states = (c**g)*g*g
