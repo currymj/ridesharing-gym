@@ -2,7 +2,8 @@ import gym
 import gym.spaces as spaces
 import numpy as np
 from ridesharing_gym.util import GridParameters
-
+from joblib import Parallel, delayed
+import multiprocessing
 
 class RidesharingEnv(gym.Env):
 
@@ -29,14 +30,11 @@ class RidesharingEnv(gym.Env):
 
         self.f_map, self.b_map = self._get_maps()
 
-        self.P = self._get_P()
+        self._get_P()
         
         self.grid_state = np.copy(init_state.astype('int8'))
 
         self.request_state = self._draw_request()
-
-
-
 
 
     def _get_P(self):
@@ -50,21 +48,26 @@ class RidesharingEnv(gym.Env):
         grid_size = self.grid.grid_size
 
         #initialize the transition matrix
-        P = np.zeros((num_states, num_actions), dtype=object)
+        self.P = np.zeros((num_states, num_actions), dtype=object)
 
-        #loop over state-action pairs
-        for s in range(num_states):
-            print(s / 1594323 * 100)
-            for a in range(num_actions):
-                P[s][a] = []
-                #update P only if legal moves
-                if self._legal_moves(s, a):
-                    #loop over requests
-                    for r in np.ndindex((grid_size, grid_size)):
-                        prob = (1.0/grid_size)**2 #this will change for non-uniform distribution
-                        next_state, reward = self._step_index(s, a, r)
-                        P[s][a].append((prob, next_state, reward))
-        return P
+        #run parallel 
+        state_space = range(num_states)
+        num_cores = multiprocessing.cpu_count()
+        Parallel(n_jobs=num_cores)(delayed(self._single_state_P)(s) for s in state_space)   
+
+
+    def _single_state_P(self, s):
+        num_actions = self.action_space.n
+        grid_size = self.grid.grid_size
+        print(s / 1594323)
+        for a in range(num_actions):
+            self.P[s][a] = []
+            if self._legal_moves(s, a):
+                #loop over requests
+                for r in np.ndindex((grid_size, grid_size)):
+                    prob = (1.0/grid_size)**2 
+                    next_state, reward = self._step_index(s, a, r)
+                    self.P[s][a].append((prob, next_state, reward))
 
 
     def _get_num_states(self):
