@@ -11,12 +11,11 @@ class RidesharingEnv(gym.Env):
 
         self.action_space = spaces.Discrete(6) # N,S,E,W, center, and reject
         # due to gym limitations must hardcode these parameters
-        self.grid = GridParameters(5, 5, 20)
+        self.grid = GridParameters(2, 2, 2)
         self.euclid = False
 
-        init_state = np.zeros(25)
-        init_state[12] = 10
-        #init_state = 4*np.ones(25)
+        init_state = np.zeros(4)
+        init_state[0] = 1
 
         # save the initial state for calls to self.reset()
         self.init_state = init_state.astype('int8')
@@ -34,7 +33,7 @@ class RidesharingEnv(gym.Env):
         A method to randomly sample a request between two pairs of locations.
         Currently, draws uniformly at random.
         """
-        return np.random.randint(25, size=2, dtype='int8')
+        return np.random.randint(4, size=2, dtype='int8')
 
 
     def step(self, action):
@@ -49,9 +48,9 @@ class RidesharingEnv(gym.Env):
         # move cars around if needed
         if action == 0: # reject
             pass
+        elif self._update_car(loc, -1) < 0 or self._update_car(request_end, 1) < 0:
+            reward = -9999
         else:
-            self._update_car(loc, -1)
-            self._update_car(request_end, 1)
             reward = self._get_reward(loc, request_end)
 
         # draw new request
@@ -67,18 +66,15 @@ class RidesharingEnv(gym.Env):
         Checks capacity and updates location.
         """
         if location == -1:
-            raise Exception('Illegal movement. Location out of bound!')
+            return -1
 
         update = self.grid_state[location] + change
 
-        if update < 0:
-            raise Exception('Illegal movement. Number of cars below zero from location ', location)
-        elif update > self.grid.capacity:
-            raise Exception('Illegal movement. Number of cars beyond capacity from location ', location)
+        if update < 0 or update > self.grid.capacity:
+            return -1
         else:
-            self.grid_state[location] += change
+            return 1
 
-        return
 
     def _get_reward(self, start, end, c=1):
         """
