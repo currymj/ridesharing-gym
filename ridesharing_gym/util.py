@@ -1,4 +1,5 @@
 import numpy as np
+import csv
 def undiscounted_episode_returns(rewards):
     """
     Given a sequence of rewards, returns the sequence
@@ -18,6 +19,21 @@ def discounted_episode_returns(rewards, gamma=0.999):
     result = [np.dot(discounts[:length-i], rewards[i:]) for i in range(length)]
     return result
 
+
+def read_requests_csv(filename, grid):
+    weights = {}
+    probabilities = {}
+    with open(filename, 'r') as file:
+        rr = csv.reader(file)
+        for line in rr:
+            request_type, weight, request_prob = line
+            startX, startY, endX, endY = request_type.split(';')
+            start_loc = grid.get_loc_from_coords([int(startX), int(startY)])
+            end_loc = grid.get_loc_from_coords([int(endX), int(endY)])
+            weights[(start_loc, end_loc)] = float(weight)
+            probabilities[(start_loc, end_loc)] = float(request_prob)
+
+    return (probabilities, weights)
 
 class GridParameters:
 
@@ -53,8 +69,13 @@ class GridParameters:
         """
         lat = location % self.width
         long = location % self.length
-        
+
         return np.array([lat, long])
+
+    def get_loc_from_coords(self, coord_array):
+        lat = coord_array[0]
+        lon = coord_array[1]
+        return (lon*self.width) + lat
 
     def get_dist(self, origin, end):
         """

@@ -88,9 +88,11 @@ if __name__ == "__main__":
             # env.render()
             action = agent.act(state)
             next_state, reward, done, _ = env.step(action)
-            print('state: ', state, 'action:', action, 'reward:', reward)
+            print('action:', action, 'reward:', reward)
             print('total cars: {}'.format(np.sum(next_state[0])))
             reward = reward if not done else -10
+            if reward == 0.0 and action != 0:
+                print('mistake')
             #next_state = list(next_state[0]) + list(next_state[1])
             #next_state = np.reshape(next_state, [1, state_size])
             next_state = to_onehot(next_state)
