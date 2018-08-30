@@ -84,7 +84,7 @@ class RidesharingEnv(gym.Env):
         self.grid_state = np.asarray(self.f_map[index][0])
         self.request_state = np.asarray(self.f_map[index][1])
         next_state, reward, _, _ = self.step(action)
-        next_state = (tuple(next_state[0]), tuple(next_state[1]))
+        next_state = (tuple(next_state[0]), tuple(request))
         next_index = self.b_map[next_state]
 
         return next_index, reward
