@@ -10,15 +10,11 @@ class RidesharingEnv(gym.Env):
 
         self.action_space = spaces.Discrete(6) # N,S,E,W, center, and reject
         # due to gym limitations must hardcode these parameters
-        self.grid = GridParameters(3, 3, 1)
+        self.grid = GridParameters(2, 2, 3)
         self.euclid = False
 
         init_state = np.zeros(self.grid.grid_size)
         init_state[0] = 1
-        init_state[1] = 0
-        init_state[2] = 0
-        init_state[3] = 0 
-        #init_state = 4*np.ones(25)
 
         # save the initial state for calls to self.reset()
         self.init_state = init_state.astype('int8')
@@ -49,15 +45,17 @@ class RidesharingEnv(gym.Env):
         #initialize the transition matrix
         self.P = np.zeros((num_states, num_actions), dtype=object)
 
-        #run parallel across actions
-        Parallel(n_jobs=6)(delayed(self._single_a_P)(a, num_states, grid_size) for a in range(num_actions))   
+        #loop over actions
+        for a in range(num_actions):
+            self._single_a_P(a, num_states, grid_size)
+        #Parallel(n_jobs=6)(delayed(self._single_a_P)(a, num_states, grid_size) for a in range(num_actions))   
 
 
     def _single_a_P(self, a, num_states, grid_size):
         
         prob = (1.0/grid_size)**2 
         for s in range(num_states):
-            print(s / num_states * 100, a)
+            #print(s / num_states * 100, a)
             self.P[s][a] = []
             if self._legal_moves(s, a):
                 #loop over requests

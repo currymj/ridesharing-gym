@@ -9,6 +9,8 @@ env = gym.make('ridesharing-v0')
 
 vf = valueIteration(env)
 opt_policy = get_policy(env, vf)
+np.savetxt("examples/csv/opt_policy.csv", opt_policy.astype(int), delimiter=",")
+
 
 observed_state = env.reset()
 observed_state_index = env.b_map[(tuple(observed_state[0]), tuple(observed_state[1]))]
@@ -21,8 +23,9 @@ def vec_to_fig(input_vector, fig_name, num_period):
     fig = map.get_figure()
     fig.savefig("examples/figures/" + fig_name + ".png")
     fig.clf()
+    np.savetxt("examples/csv/rate_matrix.csv", rate, delimiter=",")
 
-periods = [10, 100, 500, 1000]
+periods = [10, 100, 1000]
 
 for num_period in periods:
 
