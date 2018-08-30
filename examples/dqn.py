@@ -64,25 +64,35 @@ class DQNAgent:
 
 if __name__ == "__main__":
     env = gym.make('ridesharing-v0')
-    state_size = 6
+    raw_state = env.reset()
+    def to_onehot(state):
+        grid, requests = state
+        requests_onehot = np.eye(len(grid))[requests]
+        stacked = np.vstack( (grid, requests_onehot))
+        return np.reshape(stacked.flatten(), (1, -1))
+    state = to_onehot(raw_state).flatten()
+    state_size = state.size
+    print(state_size)
     num_actions = env.action_space.n
     agent = DQNAgent(state_size, num_actions)
     done = False
     batch_size = 32
 
     for e in range(EPISODES):
-        state = env.reset()
-        state = list(state[0]) + list(state[1])
-        state = np.reshape(state, [1, state_size])
-        print(state)
+        raw_state = env.reset()
+        #state = list(state[0]) + list(state[1])
+        #state = np.reshape(state, [1, state_size])
+        state = to_onehot(raw_state)
+
         for time in range(500):
             # env.render()
             action = agent.act(state)
             next_state, reward, done, _ = env.step(action)
-            print('grid:', state[0][0:4], 'request', state[0][4:6], 'action:', action, 'reward:', reward)
+            print('state: ', state, 'action:', action, 'reward:', reward)
             reward = reward if not done else -10
-            next_state = list(next_state[0]) + list(next_state[1])
-            next_state = np.reshape(next_state, [1, state_size])
+            #next_state = list(next_state[0]) + list(next_state[1])
+            #next_state = np.reshape(next_state, [1, state_size])
+            next_state = to_onehot(next_state)
             agent.remember(state, action, reward, next_state, done)
             state = next_state
             if done:
@@ -91,6 +101,6 @@ if __name__ == "__main__":
                 break
             if len(agent.memory) > batch_size:
                 agent.replay(batch_size)
-        
+
 
 

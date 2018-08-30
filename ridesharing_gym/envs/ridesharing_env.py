@@ -33,7 +33,7 @@ class RidesharingEnv(gym.Env):
         A method to randomly sample a request between two pairs of locations.
         Currently, draws uniformly at random.
         """
-        return np.random.randint(4, size=2, dtype='int8')
+        return np.random.randint(self.grid.grid_size, size=2, dtype='int8')
 
 
     def step(self, action):
