@@ -11,11 +11,11 @@ class RidesharingEnv(gym.Env):
 
         self.action_space = spaces.Discrete(6) # N,S,E,W, center, and reject
         # due to gym limitations must hardcode these parameters
-        self.grid = GridParameters(2, 2, 2)
+        self.grid = GridParameters(5, 5, 10)
         self.euclid = False
 
-        init_state = np.zeros(4)
-        init_state[0] = 1
+        init_state = np.zeros(25)
+        init_state[0] = 10
 
         # save the initial state for calls to self.reset()
         self.init_state = init_state.astype('int8')
@@ -49,8 +49,10 @@ class RidesharingEnv(gym.Env):
         if action == 0: # reject
             pass
         elif self._update_car(loc, -1) < 0 or self._update_car(request_end, 1) < 0:
-            reward = -9999
+            reward = -99
         else:
+            self._update_car_mutate(loc, -1)
+            self._update_car_mutate(request_end, 1)
             reward = self._get_reward(loc, request_end)
 
         # draw new request
@@ -63,7 +65,7 @@ class RidesharingEnv(gym.Env):
 
     def _update_car(self, location, change):
         """
-        Checks capacity and updates location.
+        Checks capacity 
         """
         if location == -1:
             return -1
@@ -75,6 +77,17 @@ class RidesharingEnv(gym.Env):
         else:
             return 1
 
+    def _update_car_mutate(self, location, change):
+        if location == -1:
+            raise Exception("shouldn't be updating!")
+
+        update = self.grid_state[location] + change
+
+        if update < 0 or update > self.grid.capacity:
+            raise Exception("shouldn't be updating!")
+        else:
+            self.grid_state[location] += change
+
 
     def _get_reward(self, start, end, c=1):
         """
@@ -83,7 +96,7 @@ class RidesharingEnv(gym.Env):
         dist = self.grid.get_dist(start, end)
         reward = dist * c
         if not self.euclid:
-            reward = 1.0
+            reward = 100.0
 
         return reward
 

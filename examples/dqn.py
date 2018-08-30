@@ -89,6 +89,7 @@ if __name__ == "__main__":
             action = agent.act(state)
             next_state, reward, done, _ = env.step(action)
             print('state: ', state, 'action:', action, 'reward:', reward)
+            print('total cars: {}'.format(np.sum(next_state[0])))
             reward = reward if not done else -10
             #next_state = list(next_state[0]) + list(next_state[1])
             #next_state = np.reshape(next_state, [1, state_size])
