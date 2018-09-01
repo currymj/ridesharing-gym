@@ -24,7 +24,7 @@ class RidesharingEnv(gym.Env):
                                        #for y in range(self.grid.grid_size)])
 
         # bad! bad! don't hardcode this!
-        probabilities_dict, _ = read_requests_csv('/Users/curry/src/ridesharing-gym/ridesharing_gym/envs/request_rates.csv', self.grid)
+        probabilities_dict, _ = read_requests_csv('./ridesharing_gym/envs/request_rates.csv', self.grid)
 
         r_array = list(probabilities_dict.keys())
         self.request_array = np.stack([np.array([x[0], x[1]], dtype='int64') for x in r_array])
