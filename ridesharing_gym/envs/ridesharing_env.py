@@ -10,7 +10,7 @@ class RidesharingEnv(gym.Env):
 
         self.action_space = spaces.Discrete(6) # N,S,E,W, center, and reject
         # due to gym limitations must hardcode these parameters
-        self.grid = GridParameters(2, 2, 3)
+        self.grid = GridParameters(3, 3, 1)
         self.euclid = False
 
         init_state = np.zeros(self.grid.grid_size)

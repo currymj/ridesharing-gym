@@ -5,7 +5,7 @@ import numpy as np; np.random.seed(0)
 env = gym.make('ridesharing-v0')
 
 
-def valueIteration(env, gamma=0.9, loop=10000, epsilon=0.1, diff=100):
+def valueIteration(env, gamma=0.9, loop=200, epsilon=0.1, diff=100):
     """
     Implementing value iteration
     Returns a value function
@@ -16,6 +16,7 @@ def valueIteration(env, gamma=0.9, loop=10000, epsilon=0.1, diff=100):
     
     
     for i in range(loop):
+        print(i)
         vf_p = np.copy(vf) #previous value function
         for s in range(num_states):
             Q_sa = [] #init Q-value for state action pair
