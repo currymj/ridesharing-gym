@@ -18,10 +18,6 @@ class RidesharingEnv(gym.Env):
 
         # save the initial state for calls to self.reset()
         self.init_state = init_state.astype('int8')
-        #self.request_probabilities = (1.0 / (self.grid.grid_size * self.grid.grid_size)) * np.ones(self.grid.grid_size * self.grid.grid_size)
-        #self.request_array = np.stack([np.array([x, y], dtype='int64')
-                                       #for x in range(self.grid.grid_size)
-                                       #for y in range(self.grid.grid_size)])
 
         # bad! bad! don't hardcode this!
         probabilities_dict, weights_dict = read_requests_csv('./ridesharing_gym/envs/request_rates.csv', self.grid)
@@ -46,7 +42,6 @@ class RidesharingEnv(gym.Env):
         A method to randomly sample a request between two pairs of locations.
         Currently, draws uniformly at random.
         """
-        #return np.random.randint(self.grid.grid_size, size=2, dtype='int8')
         chosen_index = np.random.choice(self.request_array.shape[0], p=self.request_probabilities)
         chosen_request = self.request_array[chosen_index,:]
         return chosen_request

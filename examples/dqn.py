@@ -81,12 +81,9 @@ if __name__ == "__main__":
 
     for e in range(EPISODES):
         raw_state = env.reset()
-        #state = list(state[0]) + list(state[1])
-        #state = np.reshape(state, [1, state_size])
         state = to_onehot(raw_state)
 
         for time in range(500):
-            # env.render()
             action = agent.act(state)
             next_state, reward, done, _ = env.step(action)
             print('action:', action, 'reward:', reward)
@@ -94,8 +91,6 @@ if __name__ == "__main__":
             reward = reward if not done else -10
             if action == 0:
                 print('chose reject')
-            #next_state = list(next_state[0]) + list(next_state[1])
-            #next_state = np.reshape(next_state, [1, state_size])
             next_state = to_onehot(next_state)
             agent.remember(state, action, reward, next_state, done)
             state = next_state
