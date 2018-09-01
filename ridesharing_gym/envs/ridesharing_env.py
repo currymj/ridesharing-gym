@@ -24,16 +24,14 @@ class RidesharingEnv(gym.Env):
                                        #for y in range(self.grid.grid_size)])
 
         # bad! bad! don't hardcode this!
-        probabilities_dict, _ = read_requests_csv('./ridesharing_gym/envs/request_rates.csv', self.grid)
+        probabilities_dict, weights_dict = read_requests_csv('./ridesharing_gym/envs/request_rates.csv', self.grid)
+
+        self.weights_dict = weights_dict
 
         r_array = list(probabilities_dict.keys())
         self.request_array = np.stack([np.array([x[0], x[1]], dtype='int64') for x in r_array])
         self.request_probabilities = np.array([probabilities_dict[x] for x in r_array])
 
-
-        print(self.request_array.shape)
-        print(self.request_probabilities.shape)
-        print(self.grid.grid_size * self.grid.grid_size)
 
         self.grid_state = np.copy(init_state.astype('int8'))
 
@@ -52,7 +50,7 @@ class RidesharingEnv(gym.Env):
         chosen_index = np.random.choice(self.request_array.shape[0], p=self.request_probabilities)
         chosen_request = self.request_array[chosen_index,:]
         return chosen_request
-    
+
 
 
 
@@ -73,7 +71,7 @@ class RidesharingEnv(gym.Env):
         else:
             self._update_car_mutate(loc, -1)
             self._update_car_mutate(request_end, 1)
-            reward = self._get_reward(loc, request_end)
+            reward = self._get_reward(request_start, request_end)
 
         # draw new request
         self.request_state = self._draw_request()
@@ -113,8 +111,7 @@ class RidesharingEnv(gym.Env):
         """
         Returns the reward score.
         """
-        dist = self.grid.get_dist(start, end)
-        reward = dist * c
+        reward = self.weights_dict[(start, end)] * c
         if not self.euclid:
             reward = 1.0
 
