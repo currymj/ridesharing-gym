@@ -7,9 +7,6 @@ from keras.models import Sequential
 from keras.layers import Dense
 from keras.optimizers import Adam
 
-
-
-
 class DQNAgent:
     def __init__(self, state_size, num_actions):
         self.state_size = state_size
@@ -61,7 +58,6 @@ class DQNAgent:
         self.model.save_weights(name)
 
 
-EPISODES = 30
 if __name__ == "__main__":
     env = gym.make('ridesharing-v0')
     env.euclid = True
@@ -76,14 +72,15 @@ if __name__ == "__main__":
     num_actions = env.action_space.n
     agent = DQNAgent(state_size, num_actions)
     done = False
-    batch_size = 32
-
+    batch_size = 64
+    EPISODES = 10
+    TRAIN_TIME = 5000
     # training
     for e in range(EPISODES):
         raw_state = env.reset()
         state = to_onehot(raw_state)
 
-        for time in range(500):
+        for time in range(TRAIN_TIME):
             action = agent.act(state)
             next_state, reward, done, _ = env.step(action)
             print('t:', time, 'action:', action, 'reward:', reward)
@@ -101,18 +98,22 @@ if __name__ == "__main__":
             if len(agent.memory) > batch_size:
                 agent.replay(batch_size)
 
-    EVAL_EPISODES = 3
-    EVAL_TIME = 500
+    EVAL_EPISODES = 30
+    EVAL_TIME = 1000
     obj = [list() for i in range(EVAL_TIME)]
     print('training done, evaluating...')
     for e in range(EVAL_EPISODES):
         obj_run = 0.0
         raw_state = env.reset()
         state = to_onehot(raw_state)
-        for time in range(EVAL_TIME):
+        for time in range(1,EVAL_TIME+1):
             action = agent.act(state)
             next_state, reward, done, _ = env.step(action)
             obj_run += reward
             obj[time-1].append(obj_run / time)
             next_state = to_onehot(next_state)
             state = next_state
+
+    means = np.array([np.mean(o) for o in obj])
+    print(means)
+    np.save('mean_objs', means)

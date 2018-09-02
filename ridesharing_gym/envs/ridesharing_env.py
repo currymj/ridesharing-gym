@@ -2,7 +2,43 @@ import gym
 import gym.spaces as spaces
 import numpy as np
 from ridesharing_gym.util import GridParameters, read_requests_csv
+import math
 
+# from dynamic-ride-sharing repo
+
+def random_ints_with_sum(n, m, c):
+    "Generates a length n integer array, all at most  c, of total m."
+    samples=np.random.uniform(0, c, n)
+    if sum(samples) < m:
+        return random_ints_with_sum(n, m, c)
+    samples=(m/float(sum(samples)))*samples
+
+    i=0
+    j=1
+    while True:
+        if samples[i].is_integer():
+            i=j
+            j=j+1
+        if j>=n:
+            break
+        if samples[j].is_integer():
+            j=j+1
+
+        if j>=n:
+            break
+
+        alpha=min(math.ceil(samples[i])-samples[i], samples[j]-math.floor(samples[j]))
+        beta=min(samples[i]-math.floor(samples[i]), math.ceil(samples[j])-samples[j])
+
+        r=np.random.uniform(0, 1)
+        if r<=beta/(alpha + beta):
+            samples[i]+=alpha
+            samples[j]-=alpha
+        else:
+            samples[i]-=beta
+            samples[j]+=beta
+
+    return samples
 
 class RidesharingEnv(gym.Env):
 
@@ -14,7 +50,7 @@ class RidesharingEnv(gym.Env):
         self.grid = GridParameters(21, 11, 50)
         self.euclid = False
 
-        init_state = 1.0*np.ones(self.grid.grid_size)
+        init_state = random_ints_with_sum(self.grid.grid_size, 5000, self.grid.capacity)
 
         # save the initial state for calls to self.reset()
         self.init_state = init_state.astype('int8')
@@ -35,7 +71,7 @@ class RidesharingEnv(gym.Env):
 
         self.observation_space = spaces.Tuple((spaces.MultiDiscrete(np.tile(self.grid.capacity, self.grid.grid_size)), 
                                                spaces.MultiDiscrete(np.array([self.grid.grid_size, self.grid.grid_size]))))
-        # not done
+
 
     def _draw_request(self):
         """
