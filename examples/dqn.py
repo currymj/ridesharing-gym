@@ -8,7 +8,6 @@ from keras.layers import Dense
 from keras.optimizers import Adam
 
 
-EPISODES = 1000
 
 
 class DQNAgent:
@@ -62,6 +61,7 @@ class DQNAgent:
         self.model.save_weights(name)
 
 
+EPISODES = 30
 if __name__ == "__main__":
     env = gym.make('ridesharing-v0')
     env.euclid = True
@@ -73,12 +73,12 @@ if __name__ == "__main__":
         return np.reshape(stacked.flatten(), (1, -1))
     state = to_onehot(raw_state).flatten()
     state_size = state.size
-    print(state_size)
     num_actions = env.action_space.n
     agent = DQNAgent(state_size, num_actions)
     done = False
     batch_size = 32
 
+    # training
     for e in range(EPISODES):
         raw_state = env.reset()
         state = to_onehot(raw_state)
@@ -86,8 +86,8 @@ if __name__ == "__main__":
         for time in range(500):
             action = agent.act(state)
             next_state, reward, done, _ = env.step(action)
-            print('action:', action, 'reward:', reward)
-            print('total cars: {}'.format(np.sum(next_state[0])))
+            print('t:', time, 'action:', action, 'reward:', reward)
+            #print('total cars: {}'.format(np.sum(next_state[0])))
             reward = reward if not done else -10
             if action == 0:
                 print('chose reject')
@@ -101,5 +101,18 @@ if __name__ == "__main__":
             if len(agent.memory) > batch_size:
                 agent.replay(batch_size)
 
-
-
+    EVAL_EPISODES = 3
+    EVAL_TIME = 500
+    obj = [list() for i in range(EVAL_TIME)]
+    print('training done, evaluating...')
+    for e in range(EVAL_EPISODES):
+        obj_run = 0.0
+        raw_state = env.reset()
+        state = to_onehot(raw_state)
+        for time in range(EVAL_TIME):
+            action = agent.act(state)
+            next_state, reward, done, _ = env.step(action)
+            obj_run += reward
+            obj[time-1].append(obj_run / time)
+            next_state = to_onehot(next_state)
+            state = next_state
