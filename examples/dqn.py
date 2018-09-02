@@ -6,6 +6,7 @@ from collections import deque
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.optimizers import Adam
+from tqdm import tqdm
 
 class DQNAgent:
     def __init__(self, state_size, num_actions):
@@ -73,21 +74,22 @@ if __name__ == "__main__":
     agent = DQNAgent(state_size, num_actions)
     done = False
     batch_size = 64
-    EPISODES = 10
-    TRAIN_TIME = 5000
+    EPISODES = 5
+    TRAIN_TIME = 2500
     # training
     for e in range(EPISODES):
         raw_state = env.reset()
         state = to_onehot(raw_state)
+        print('Episode {}'.format(e))
 
-        for time in range(TRAIN_TIME):
+        for time in tqdm(range(TRAIN_TIME)):
             action = agent.act(state)
             next_state, reward, done, _ = env.step(action)
-            print('t:', time, 'action:', action, 'reward:', reward)
+            #print('t:', time, 'action:', action, 'reward:', reward)
             #print('total cars: {}'.format(np.sum(next_state[0])))
             reward = reward if not done else -10
-            if action == 0:
-                print('chose reject')
+            #if action == 0:
+                #print('chose reject')
             next_state = to_onehot(next_state)
             agent.remember(state, action, reward, next_state, done)
             state = next_state
@@ -103,10 +105,11 @@ if __name__ == "__main__":
     obj = [list() for i in range(EVAL_TIME)]
     print('training done, evaluating...')
     for e in range(EVAL_EPISODES):
+        print('Evaluation episode {}'.format(e))
         obj_run = 0.0
         raw_state = env.reset()
         state = to_onehot(raw_state)
-        for time in range(1,EVAL_TIME+1):
+        for time in tqdm(range(1,EVAL_TIME+1)):
             action = agent.act(state)
             next_state, reward, done, _ = env.step(action)
             obj_run += reward
