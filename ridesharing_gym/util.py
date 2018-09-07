@@ -1,5 +1,6 @@
 import numpy as np
 import csv
+
 def undiscounted_episode_returns(rewards):
     """
     Given a sequence of rewards, returns the sequence
@@ -34,6 +35,7 @@ def read_requests_csv(filename, grid):
             probabilities[(start_loc, end_loc)] = float(request_prob)
 
     return (probabilities, weights)
+
 
 class GridParameters:
 
